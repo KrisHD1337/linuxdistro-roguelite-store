@@ -6,18 +6,14 @@ import ch.kris.model.Order;
 import ch.kris.model.Package;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.NotFoundException;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @ApplicationScoped
 public class OrderService {
-    private final List<Order> orders = new ArrayList<>();
-
-    private long nextOrderId = 3;
-
     @Inject
     AccountService accountService;
 
@@ -25,47 +21,46 @@ public class OrderService {
     PackageService packageService;
 
     public List<Order> findAllOrders() {
-        return orders;
+        return Order.listAll();
     }
 
     public Order findOrderById(Long orderId) {
-        return orders.stream()
-                .filter(order -> order.getOrderId().equals(orderId))
-                .findFirst()
-                .orElseThrow(() -> new NotFoundException("Order with id " + orderId + " was not found."));
+        Order order = Order.findById(orderId);
+        if (order == null) {
+            throw new NotFoundException("Order with id " + orderId + " was not found.");
+        }
+        return order;
     }
 
+    @Transactional
     public Order createOrder(OrderDto orderDto) {
         Account account = accountService.findAccountByUid(orderDto.getUid());
-        Package Package = packageService.findPackageById(orderDto.getPackageId());
+        Package distroPackage = packageService.findPackageById(orderDto.getPackageId());
 
-        if (!Package.isActive()) {
-            throw new BadRequestException("Package with id " + Package.getPackageId() + " is not active.");
+        if (!distroPackage.isActive()) {
+            throw new BadRequestException("Package with id " + distroPackage.getPackageId() + " is not active.");
         }
 
-        boolean firstTimePurchase = isFirstTimePackagePurchase(account.getUid(), Package.getPackageId());
-        int bonusAmount = firstTimePurchase ? Package.getCurrencyAmount() : Package.getBonusAmount();
-        int creditedAmount = Package.getCurrencyAmount() + bonusAmount;
+        boolean firstTimePurchase = isFirstTimePackagePurchase(account.getUid(), distroPackage.getPackageId());
+        int bonusAmount = firstTimePurchase ? distroPackage.getCurrencyAmount() : distroPackage.getBonusAmount();
+        int creditedAmount = distroPackage.getCurrencyAmount() + bonusAmount;
 
         Order order = new Order(
-                nextOrderId++,
+                null,
                 account.getUid(),
-                Package.getPackageId(),
+                distroPackage.getPackageId(),
                 "PAID",
-                Package.getPriceChfCents(),
+                distroPackage.getPriceChfCents(),
                 creditedAmount,
                 bonusAmount,
                 firstTimePurchase
         );
-        orders.add(order);
+        order.persistAndFlush();
         accountService.creditRootCredits(account.getUid(), creditedAmount, "Order " + order.getOrderId());
         return order;
     }
 
     private boolean isFirstTimePackagePurchase(Long uid, Long packageId) {
-        return orders.stream()
-                .noneMatch(order -> order.getUid().equals(uid)
-                        && order.getPackageId().equals(packageId)
-                        && "PAID".equals(order.getStatus()));
+        return Order.count("uid = ?1 and packageId = ?2 and status = ?3", uid, packageId, "PAID") == 0;
     }
 }
