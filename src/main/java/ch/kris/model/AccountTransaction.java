@@ -1,6 +1,6 @@
 package ch.kris.model;
 
-public class WalletTransaction {
+public class AccountTransaction {
     private Long transactionId;
     private Long uid;
     private int amount;
@@ -9,10 +9,10 @@ public class WalletTransaction {
     private String reason;
     private int balanceAfter;
 
-    public WalletTransaction() {
+    public AccountTransaction() {
     }
 
-    public WalletTransaction(Long transactionId, Long uid, int amount, String currency, String type, String reason, int balanceAfter) {
+    public AccountTransaction(Long transactionId, Long uid, int amount, String currency, String type, String reason, int balanceAfter) {
         this.transactionId = transactionId;
         this.uid = uid;
         this.amount = amount;

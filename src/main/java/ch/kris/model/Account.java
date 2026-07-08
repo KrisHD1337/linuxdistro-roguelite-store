@@ -1,15 +1,17 @@
 package ch.kris.model;
 
-public class Wallet {
+public class Account {
     private Long uid;
+    private String playerName;
     private int rootCredits;
     private int entropy;
 
-    public Wallet() {
+    public Account() {
     }
 
-    public Wallet(Long uid, int rootCredits, int entropy) {
+    public Account(Long uid, String playerName, int rootCredits, int entropy) {
         this.uid = uid;
+        this.playerName = playerName;
         this.rootCredits = rootCredits;
         this.entropy = entropy;
     }
@@ -20,6 +22,14 @@ public class Wallet {
 
     public void setUid(Long uid) {
         this.uid = uid;
+    }
+
+    public String getPlayerName() {
+        return playerName;
+    }
+
+    public void setPlayerName(String playerName) {
+        this.playerName = playerName;
     }
 
     public int getRootCredits() {

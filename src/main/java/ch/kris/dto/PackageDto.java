@@ -2,7 +2,7 @@ package ch.kris.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class StorePackageDto {
+public class PackageDto {
     private String name;
     private int priceChfCents;
     private int currencyAmount;

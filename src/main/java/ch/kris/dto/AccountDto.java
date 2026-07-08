@@ -1,6 +1,6 @@
 package ch.kris.dto;
 
-public class GameAccountDto {
+public class AccountDto {
     private String playerName;
 
     public String getPlayerName() {

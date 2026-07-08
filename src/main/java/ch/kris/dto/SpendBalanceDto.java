@@ -1,6 +1,6 @@
 package ch.kris.dto;
 
-public class SpendWalletDto {
+public class SpendBalanceDto {
     private Long uid;
     private int amount;
     private String currency;
