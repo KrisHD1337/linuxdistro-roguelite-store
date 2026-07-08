@@ -2,7 +2,7 @@ package ch.kris.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class StorePackage {
+public class Package {
     private Long packageId;
     private String name;
     private int priceChfCents;
@@ -12,10 +12,10 @@ public class StorePackage {
     @JsonProperty("isActive")
     private boolean active;
 
-    public StorePackage() {
+    public Package() {
     }
 
-    public StorePackage(Long packageId, String name, int priceChfCents, int currencyAmount, int bonusAmount, boolean active) {
+    public Package(Long packageId, String name, int priceChfCents, int currencyAmount, int bonusAmount, boolean active) {
         this.packageId = packageId;
         this.name = name;
         this.priceChfCents = priceChfCents;

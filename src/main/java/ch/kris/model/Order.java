@@ -1,6 +1,6 @@
 package ch.kris.model;
 
-public class StoreOrder {
+public class Order {
     private Long orderId;
     private Long uid;
     private Long packageId;
@@ -10,10 +10,10 @@ public class StoreOrder {
     private int bonusAmount;
     private boolean firstTimePurchaseBonus;
 
-    public StoreOrder() {
+    public Order() {
     }
 
-    public StoreOrder(Long orderId, Long uid, Long packageId, String status, int priceChfCents, int creditedAmount, int bonusAmount, boolean firstTimePurchaseBonus) {
+    public Order(Long orderId, Long uid, Long packageId, String status, int priceChfCents, int creditedAmount, int bonusAmount, boolean firstTimePurchaseBonus) {
         this.orderId = orderId;
         this.uid = uid;
         this.packageId = packageId;

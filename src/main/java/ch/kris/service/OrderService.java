@@ -2,8 +2,8 @@ package ch.kris.service;
 
 import ch.kris.dto.OrderDto;
 import ch.kris.model.Account;
-import ch.kris.model.StoreOrder;
-import ch.kris.model.StorePackage;
+import ch.kris.model.Order;
+import ch.kris.model.Package;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.BadRequestException;
@@ -14,7 +14,7 @@ import java.util.List;
 
 @ApplicationScoped
 public class OrderService {
-    private final List<StoreOrder> orders = new ArrayList<>();
+    private final List<Order> orders = new ArrayList<>();
 
     private long nextOrderId = 3;
 
@@ -24,35 +24,35 @@ public class OrderService {
     @Inject
     PackageService packageService;
 
-    public List<StoreOrder> findAllOrders() {
+    public List<Order> findAllOrders() {
         return orders;
     }
 
-    public StoreOrder findOrderById(Long orderId) {
+    public Order findOrderById(Long orderId) {
         return orders.stream()
                 .filter(order -> order.getOrderId().equals(orderId))
                 .findFirst()
                 .orElseThrow(() -> new NotFoundException("Order with id " + orderId + " was not found."));
     }
 
-    public StoreOrder createOrder(OrderDto orderDto) {
+    public Order createOrder(OrderDto orderDto) {
         Account account = accountService.findAccountByUid(orderDto.getUid());
-        StorePackage storePackage = packageService.findPackageById(orderDto.getPackageId());
+        Package Package = packageService.findPackageById(orderDto.getPackageId());
 
-        if (!storePackage.isActive()) {
-            throw new BadRequestException("Package with id " + storePackage.getPackageId() + " is not active.");
+        if (!Package.isActive()) {
+            throw new BadRequestException("Package with id " + Package.getPackageId() + " is not active.");
         }
 
-        boolean firstTimePurchase = isFirstTimePackagePurchase(account.getUid(), storePackage.getPackageId());
-        int bonusAmount = firstTimePurchase ? storePackage.getCurrencyAmount() : storePackage.getBonusAmount();
-        int creditedAmount = storePackage.getCurrencyAmount() + bonusAmount;
+        boolean firstTimePurchase = isFirstTimePackagePurchase(account.getUid(), Package.getPackageId());
+        int bonusAmount = firstTimePurchase ? Package.getCurrencyAmount() : Package.getBonusAmount();
+        int creditedAmount = Package.getCurrencyAmount() + bonusAmount;
 
-        StoreOrder order = new StoreOrder(
+        Order order = new Order(
                 nextOrderId++,
                 account.getUid(),
-                storePackage.getPackageId(),
+                Package.getPackageId(),
                 "PAID",
-                storePackage.getPriceChfCents(),
+                Package.getPriceChfCents(),
                 creditedAmount,
                 bonusAmount,
                 firstTimePurchase

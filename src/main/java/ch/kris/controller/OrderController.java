@@ -1,7 +1,7 @@
 package ch.kris.controller;
 
 import ch.kris.dto.OrderDto;
-import ch.kris.model.StoreOrder;
+import ch.kris.model.Order;
 import ch.kris.service.OrderService;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
@@ -22,21 +22,21 @@ public class OrderController {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<StoreOrder> index() {
+    public List<Order> index() {
         return orderService.findAllOrders();
     }
 
     @GET
     @Path("/{orderId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public StoreOrder show(@PathParam("orderId") Long orderId) {
+    public Order show(@PathParam("orderId") Long orderId) {
         return orderService.findOrderById(orderId);
     }
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public StoreOrder create(OrderDto orderDto) {
+    public Order create(OrderDto orderDto) {
         return orderService.createOrder(orderDto);
     }
 }

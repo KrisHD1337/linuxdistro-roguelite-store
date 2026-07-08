@@ -1,7 +1,7 @@
 package ch.kris.service;
 
 import ch.kris.dto.PackageDto;
-import ch.kris.model.StorePackage;
+import ch.kris.model.Package;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.NotFoundException;
 
@@ -10,29 +10,29 @@ import java.util.List;
 
 @ApplicationScoped
 public class PackageService {
-    private final List<StorePackage> packages = new ArrayList<>();
+    private final List<Package> packages = new ArrayList<>();
 
     private long nextPackageId = 4;
 
-    public List<StorePackage> findAllPackages() {
+    public List<Package> findAllPackages() {
         return packages;
     }
 
-    public StorePackage findPackageById(Long packageId) {
+    public Package findPackageById(Long packageId) {
         return packages.stream()
-                .filter(storePackage -> storePackage.getPackageId().equals(packageId))
+                .filter(Package -> Package.getPackageId().equals(packageId))
                 .findFirst()
                 .orElseThrow(() -> new NotFoundException("Package with id " + packageId + " was not found."));
     }
 
-    public StorePackage createPackage(PackageDto packageDto) {
-        StorePackage storePackage = createPackageFromDto(nextPackageId++, packageDto);
-        packages.add(storePackage);
-        return storePackage;
+    public Package createPackage(PackageDto packageDto) {
+        Package Package = createPackageFromDto(nextPackageId++, packageDto);
+        packages.add(Package);
+        return Package;
     }
 
-    public StorePackage updatePackage(Long packageId, PackageDto packageDto) {
-        StorePackage existingPackage = findPackageById(packageId);
+    public Package updatePackage(Long packageId, PackageDto packageDto) {
+        Package existingPackage = findPackageById(packageId);
         existingPackage.setName(packageDto.getName());
         existingPackage.setPriceChfCents(packageDto.getPriceChfCents());
         existingPackage.setCurrencyAmount(packageDto.getCurrencyAmount());
@@ -41,14 +41,14 @@ public class PackageService {
         return existingPackage;
     }
 
-    public StorePackage deletePackage(Long packageId) {
-        StorePackage storePackage = findPackageById(packageId);
-        packages.remove(storePackage);
-        return storePackage;
+    public Package deletePackage(Long packageId) {
+        Package Package = findPackageById(packageId);
+        packages.remove(Package);
+        return Package;
     }
 
-    private StorePackage createPackageFromDto(Long packageId, PackageDto packageDto) {
-        return new StorePackage(
+    private Package createPackageFromDto(Long packageId, PackageDto packageDto) {
+        return new Package(
                 packageId,
                 packageDto.getName(),
                 packageDto.getPriceChfCents(),

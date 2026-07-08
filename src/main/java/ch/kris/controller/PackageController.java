@@ -1,7 +1,7 @@
 package ch.kris.controller;
 
 import ch.kris.dto.PackageDto;
-import ch.kris.model.StorePackage;
+import ch.kris.model.Package;
 import ch.kris.service.PackageService;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
@@ -25,21 +25,21 @@ public class PackageController {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<StorePackage> index() {
+    public List<Package> index() {
         return packageService.findAllPackages();
     }
 
     @GET
     @Path("/{packageId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public StorePackage show(@PathParam("packageId") Long packageId) {
+    public Package show(@PathParam("packageId") Long packageId) {
         return packageService.findPackageById(packageId);
     }
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public StorePackage create(PackageDto packageDto) {
+    public Package create(PackageDto packageDto) {
         return packageService.createPackage(packageDto);
     }
 
@@ -48,7 +48,7 @@ public class PackageController {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response update(@PathParam("packageId") Long packageId, PackageDto packageDto) {
-        StorePackage updatedPackage = packageService.updatePackage(packageId, packageDto);
+        Package updatedPackage = packageService.updatePackage(packageId, packageDto);
         return Response.status(Response.Status.NO_CONTENT)
                 .entity(updatedPackage)
                 .build();
@@ -57,7 +57,7 @@ public class PackageController {
     @DELETE
     @Path("/{packageId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public StorePackage delete(@PathParam("packageId") Long packageId) {
+    public Package delete(@PathParam("packageId") Long packageId) {
         return packageService.deletePackage(packageId);
     }
 }
