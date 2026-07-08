@@ -3,34 +3,33 @@ package ch.kris.service;
 import ch.kris.dto.PackageDto;
 import ch.kris.model.Package;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @ApplicationScoped
 public class PackageService {
-    private final List<Package> packages = new ArrayList<>();
-
-    private long nextPackageId = 4;
-
     public List<Package> findAllPackages() {
-        return packages;
+        return Package.listAll();
     }
 
     public Package findPackageById(Long packageId) {
-        return packages.stream()
-                .filter(Package -> Package.getPackageId().equals(packageId))
-                .findFirst()
-                .orElseThrow(() -> new NotFoundException("Package with id " + packageId + " was not found."));
+        Package distroPackage = Package.findById(packageId);
+        if (distroPackage == null) {
+            throw new NotFoundException("Package with id " + packageId + " was not found.");
+        }
+        return distroPackage;
     }
 
+    @Transactional
     public Package createPackage(PackageDto packageDto) {
-        Package Package = createPackageFromDto(nextPackageId++, packageDto);
-        packages.add(Package);
-        return Package;
+        Package distroPackage = createPackageFromDto(packageDto);
+        distroPackage.persist();
+        return distroPackage;
     }
 
+    @Transactional
     public Package updatePackage(Long packageId, PackageDto packageDto) {
         Package existingPackage = findPackageById(packageId);
         existingPackage.setName(packageDto.getName());
@@ -41,15 +40,16 @@ public class PackageService {
         return existingPackage;
     }
 
+    @Transactional
     public Package deletePackage(Long packageId) {
-        Package Package = findPackageById(packageId);
-        packages.remove(Package);
-        return Package;
+        Package distroPackage = findPackageById(packageId);
+        distroPackage.delete();
+        return distroPackage;
     }
 
-    private Package createPackageFromDto(Long packageId, PackageDto packageDto) {
+    private Package createPackageFromDto(PackageDto packageDto) {
         return new Package(
-                packageId,
+                null,
                 packageDto.getName(),
                 packageDto.getPriceChfCents(),
                 packageDto.getCurrencyAmount(),

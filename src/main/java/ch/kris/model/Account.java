@@ -1,6 +1,14 @@
 package ch.kris.model;
 
-public class Account {
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "accounts")
+public class Account extends PanacheEntityBase {
+    @Id
     private Long uid;
     private String playerName;
     private int rootCredits;

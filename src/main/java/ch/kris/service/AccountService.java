@@ -5,10 +5,10 @@ import ch.kris.dto.SpendBalanceDto;
 import ch.kris.model.Account;
 import ch.kris.model.AccountTransaction;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.transaction.Transactional;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.NotFoundException;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -17,40 +17,36 @@ public class AccountService {
     private static final String ROOT_CREDITS = "ROOT_CREDITS";
     private static final String ENTROPY = "ENTROPY";
 
-    private final List<Account> accounts = new ArrayList<>();
-    private final List<AccountTransaction> transactions = new ArrayList<>();
-
-    private long nextTransactionId = 4;
-
     public List<Account> findAllAccounts() {
-        return accounts;
+        return Account.listAll();
     }
 
     public Account findAccountByUid(Long uid) {
-        return accounts.stream()
-                .filter(account -> account.getUid().equals(uid))
-                .findFirst()
-                .orElseThrow(() -> new NotFoundException("Account with uid " + uid + " was not found."));
+        Account account = Account.findById(uid);
+        if (account == null) {
+            throw new NotFoundException("Account with uid " + uid + " was not found.");
+        }
+        return account;
     }
 
+    @Transactional
     public Account createAccount(AccountDto accountDto) {
         Long uid = generateUniqueUid();
         Account account = new Account(uid, accountDto.getPlayerName(), 0, 0);
-        accounts.add(account);
+        account.persist();
         return account;
     }
 
     public List<AccountTransaction> findAllTransactions() {
-        return transactions;
+        return AccountTransaction.listAll();
     }
 
     public List<AccountTransaction> findTransactionsByUid(Long uid) {
         findAccountByUid(uid);
-        return transactions.stream()
-                .filter(transaction -> transaction.getUid().equals(uid))
-                .toList();
+        return AccountTransaction.list("uid", uid);
     }
 
+    @Transactional
     public AccountTransaction creditRootCredits(Long uid, int amount, String reason) {
         if (amount <= 0) {
             throw new BadRequestException("Amount must be greater than 0.");
@@ -61,7 +57,7 @@ public class AccountService {
         account.setRootCredits(balanceAfter);
 
         AccountTransaction transaction = new AccountTransaction(
-                nextTransactionId++,
+                null,
                 uid,
                 amount,
                 ROOT_CREDITS,
@@ -69,10 +65,11 @@ public class AccountService {
                 reason,
                 balanceAfter
         );
-        transactions.add(transaction);
+        transaction.persist();
         return transaction;
     }
 
+    @Transactional
     public AccountTransaction spendBalance(SpendBalanceDto spendBalanceDto) {
         if (spendBalanceDto.getAmount() <= 0) {
             throw new BadRequestException("Amount must be greater than 0.");
@@ -89,7 +86,7 @@ public class AccountService {
         int balanceAfter = balance - spendBalanceDto.getAmount();
         setBalance(account, currency, balanceAfter);
         AccountTransaction transaction = new AccountTransaction(
-                nextTransactionId++,
+                null,
                 account.getUid(),
                 spendBalanceDto.getAmount(),
                 currency,
@@ -97,7 +94,7 @@ public class AccountService {
                 spendBalanceDto.getReason(),
                 balanceAfter
         );
-        transactions.add(transaction);
+        transaction.persist();
         return transaction;
     }
 
@@ -110,8 +107,7 @@ public class AccountService {
     }
 
     private boolean uidExists(Long uid) {
-        return accounts.stream()
-                .anyMatch(account -> account.getUid().equals(uid));
+        return Account.count("uid", uid) > 0;
     }
 
     private String normalizeCurrency(String currency) {
