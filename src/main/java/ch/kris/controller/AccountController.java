@@ -5,7 +5,6 @@ import ch.kris.dto.SpendBalanceDto;
 import ch.kris.model.Account;
 import ch.kris.model.AccountTransaction;
 import ch.kris.service.AccountService;
-import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
@@ -19,8 +18,11 @@ import java.util.List;
 @Path("/accounts")
 public class AccountController {
 
-    @Inject
-    AccountService accountService;
+    private final AccountService accountService;
+
+    public AccountController(AccountService accountService) {
+        this.accountService = accountService;
+    }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)

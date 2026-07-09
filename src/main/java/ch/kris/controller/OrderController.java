@@ -3,7 +3,6 @@ package ch.kris.controller;
 import ch.kris.dto.OrderDto;
 import ch.kris.model.Order;
 import ch.kris.service.OrderService;
-import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
@@ -17,8 +16,11 @@ import java.util.List;
 @Path("/orders")
 public class OrderController {
 
-    @Inject
-    OrderService orderService;
+    private final OrderService orderService;
+
+    public OrderController(OrderService orderService) {
+        this.orderService = orderService;
+    }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)

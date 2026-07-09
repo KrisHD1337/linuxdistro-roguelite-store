@@ -3,7 +3,6 @@ package ch.kris.controller;
 import ch.kris.dto.PackageDto;
 import ch.kris.model.Package;
 import ch.kris.service.PackageService;
-import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
@@ -20,8 +19,11 @@ import java.util.List;
 @Path("/packages")
 public class PackageController {
 
-    @Inject
-    PackageService packageService;
+    private final PackageService packageService;
+
+    public PackageController(PackageService packageService) {
+        this.packageService = packageService;
+    }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
