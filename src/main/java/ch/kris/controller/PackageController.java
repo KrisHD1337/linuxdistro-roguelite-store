@@ -3,6 +3,8 @@ package ch.kris.controller;
 import ch.kris.dto.PackageDto;
 import ch.kris.model.Package;
 import ch.kris.service.PackageService;
+import jakarta.annotation.security.PermitAll;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
@@ -26,6 +28,7 @@ public class PackageController {
     }
 
     @GET
+    @PermitAll
     @Produces(MediaType.APPLICATION_JSON)
     public List<Package> index() {
         return packageService.findAllPackages();
@@ -33,12 +36,14 @@ public class PackageController {
 
     @GET
     @Path("/{packageId}")
+    @PermitAll
     @Produces(MediaType.APPLICATION_JSON)
     public Package show(@PathParam("packageId") Long packageId) {
         return packageService.findPackageById(packageId);
     }
 
     @POST
+    @RolesAllowed("ADMIN")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Package create(PackageDto packageDto) {
@@ -47,6 +52,7 @@ public class PackageController {
 
     @PUT
     @Path("/{packageId}")
+    @RolesAllowed("ADMIN")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response update(@PathParam("packageId") Long packageId, PackageDto packageDto) {
@@ -58,6 +64,7 @@ public class PackageController {
 
     @DELETE
     @Path("/{packageId}")
+    @RolesAllowed("ADMIN")
     @Produces(MediaType.APPLICATION_JSON)
     public Package delete(@PathParam("packageId") Long packageId) {
         return packageService.deletePackage(packageId);
