@@ -5,7 +5,6 @@ import ch.kris.model.Account;
 import ch.kris.model.Order;
 import ch.kris.model.Package;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.NotFoundException;
@@ -14,11 +13,13 @@ import java.util.List;
 
 @ApplicationScoped
 public class OrderService {
-    @Inject
-    AccountService accountService;
+    private final AccountService accountService;
+    private final PackageService packageService;
 
-    @Inject
-    PackageService packageService;
+    public OrderService(AccountService accountService, PackageService packageService) {
+        this.accountService = accountService;
+        this.packageService = packageService;
+    }
 
     public List<Order> findAllOrders() {
         return Order.listAll();
